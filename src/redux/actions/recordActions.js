@@ -3,6 +3,8 @@ import * as actionTypes from "./actionTypes";
 import { encryptRecords, decryptRecords, setEncryptionKey } from "./encryptionActions";
 import { setRememberMe } from "./rememberMeActions";
 import { setEditMode } from "./editModeActions";
+import { setSnackbar } from "./snackbarActions";
+import { setLoginLoading, setUpdateLoading } from "./loadingActions";
 
 const url = "https://europe-west1-passigndev.cloudfunctions.net/passign";
 
@@ -31,10 +33,7 @@ export function getRecords(id, authorization, key, rememberMe) {
         throw response.statusText;
       }
     }).then(data => {
-      console.log("key " + key);
       var records = decryptRecords(data, key);
-      console.log(data);
-      console.log(records);
       dispatch(setRecords(records));
       dispatch(setRecordsVisible(records));
       dispatch(loginSucces({
@@ -43,11 +42,15 @@ export function getRecords(id, authorization, key, rememberMe) {
         authorization: authorization
       }));
       dispatch(setEncryptionKey(key));
+      dispatch(setLoginLoading(false));
       if (rememberMe.state) {
         dispatch(setRememberMe(rememberMe));
       }
-    })
-      .catch(handleError);
+    }).catch(((error) => {
+      dispatch(setSnackbar({show:true, message:"Login attempt failed. Please try again.", color:"#f00"}));
+      dispatch(setLoginLoading(false));
+      console.error(error);
+  }));
   };
 }
 
@@ -69,14 +72,15 @@ export function updateRecords(id, authorization, records, key) {
         dispatch(setRecords(updated));
         dispatch(setRecordsVisible(updated));
         dispatch(setEditMode(false));
+        dispatch(setUpdateLoading(false));
+        dispatch(setSnackbar({show:true, message:"Update successful", color:"#00c853"}));
       } else {
         throw response.statusText;
       }
-    }).catch(handleError);
+    }).catch( (error) => {
+      dispatch(setSnackbar({show:true, message:"Something went wrong. Please try again.", color:"#f00"}));
+      dispatch(setUpdateLoading(false));
+      console.error(error);
+  });
   };
-}
-
-export function handleError(error) {
-  console.error("Something went wrong")
-  throw error;
 }

@@ -1,6 +1,6 @@
-import Paper from "@mui/material/Paper";
+import Paper from "@material-ui/core/Paper";
 import { Link, useParams } from "react-router-dom"
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@material-ui/core';
 import defaultLogo from "../images/default.png"
 import facebookLogo from "../images/facebook.png"
 import twitterLogo from "../images/twitter.png"
@@ -14,7 +14,6 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
   },
   record: {
-    marginLeft: theme.spacing(2),
     width: "100%",
     height: 80,
     position: "relative"
@@ -55,7 +54,7 @@ const FeedItem = ({ record }) => {
 
   return (
     <Paper className={classes.paper}>
-      <Link to={"/passwords/" + record.id} style={{ textDecoration: "none" }}>
+      <Link to={"/records/" + record.id} style={{ textDecoration: "none" }}>
 
         <div className={classes.record}>
           <img src={imageSrc()} alt={record.website} className={classes.img} />

@@ -1,11 +1,15 @@
 import React from 'react'
-import { useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import { Box, TextField, Grid, Button, Container, IconButton, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, CircularProgress } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { makeStyles } from '@material-ui/core';
+import { Avatar, Box, TextField, Typography, Grid, Button, Container, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import { connect } from "react-redux";
 import CryptoJS from 'crypto-js';
-import { createAccount } from "../redux/actions/accountActions"
+import jsPDF from 'jspdf';
+import data from "../images/pdfBackground";
+import { createAccount } from "../redux/actions/accountActions";
+import { setSnackbar } from '../redux/actions/snackbarActions';
+
 
 
 const useStyles = makeStyles((theme) => ({
@@ -21,8 +25,7 @@ const useStyles = makeStyles((theme) => ({
     },
     form: {
         marginTop: theme.spacing(2),
-        width: 400,
-        marginRight: 500
+
     },
     submit: {
         margin: theme.spacing(3, 0, 2),
@@ -41,53 +44,38 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const Signup = ({ create, account }) => {
+const Signup = ({ create, account, setSnackbarAlert }) => {
     const classes = useStyles();
     const [shortKey, setShortKey] = useState();
     const [encryptionKey, setEncryptionKey] = useState();
-    const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
+    useEffect(() => {
+        if (account.id !== "") {
+            createPdf();
+        }
+        setLoading(false);
+    }, [account])
 
     const handleClose = () => {
-        document.location.href="/login";
+        document.location.href = "/login";
     };
 
     async function copyToClipboard(text) {
         await navigator.clipboard.writeText(text);
     }
 
-    const getKey = (shortKey) => {
-        //var saltPre = CryptoJS.enc.Hex.parse("f56896d5f03d32e4169185cd02c09e15b65460bfbf900928d1ea9bfdd045bb04")
-        var k = CryptoJS.SHA256("abcdef")
-        var j = CryptoJS.enc.Hex.stringify(k)
-        console.log(j)
-        var encrypted = CryptoJS.AES.encrypt("ahmet", j);
-        console.log(encrypted.toString())
-        var decrypted = CryptoJS.AES.decrypt(encrypted + "", j)
-        console.log(decrypted.toString(CryptoJS.enc.Utf8))
-    }
-
     const changeHandler = (event) => {
-        switch (event.target.name) {
-            case "shortKey":
-                setShortKey(event.target.value);
-                break;
-            default:
-                break;
-        }
+        setShortKey(event.target.value);
     }
 
-    const generatePhrase = () => {
+    const generateAuthPhrase = () => {
         var chars = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%&()[]{}*/-+?<|>=_ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         var shuffledChars = shuffle(chars);
-        var phraseLength = Math.floor(Math.random() * 15) + 5;
+        var phraseLength = 16;
         var phrase = "";
 
-        for (var i = 0; i <= phraseLength; i++) {
+        for (var i = 0; i < phraseLength; i++) {
             var randomNumber = Math.floor(Math.random() * shuffledChars.length);
             phrase += shuffledChars.substring(randomNumber, randomNumber + 1);
         }
@@ -109,21 +97,90 @@ const Signup = ({ create, account }) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        var salt = CryptoJS.lib.WordArray.random(32);
-        var saltString = CryptoJS.enc.Hex.stringify(salt);
-        var key = CryptoJS.PBKDF2(shortKey, saltString, { keySize: 8, iterations: 1000 });
-        var aesKey = CryptoJS.enc.Hex.stringify(key);
-        var authorization = generatePhrase();
-        var authorizationToken = CryptoJS.HmacSHA512(authorization, aesKey);
-        setEncryptionKey(saltString + shortKey + authorization);
-        setLoading(true);
-        create(authorizationToken.toString());
-        //setOpen(true);
+        try {
+            if (shortKey.length < 4) {//vEnlracswbCshtvc4tcjfe8cd472c58c19cf0e2a38d7a455625a15972cc6b909edff363aa204874bc7cc*#FE=]F|w@h=]|-Fqweqwe
+                throw shortKey;
+            }
+            var salt = CryptoJS.lib.WordArray.random(32);
+            var saltString = CryptoJS.enc.Hex.stringify(salt);
+            var generatedKey = CryptoJS.PBKDF2(shortKey, saltString, { keySize: 8, iterations: 1000 });
+            var key = CryptoJS.enc.Hex.stringify(generatedKey);
+            var authorization = generateAuthPhrase();
+            var authorizationToken = CryptoJS.HmacSHA512(authorization, key);
+            setEncryptionKey(saltString + authorization + shortKey);
+            setLoading(true);
+            create(authorizationToken.toString());
+            //setOpen(true);
+        } catch (error) {
+            var alert = {
+                show: true,
+                message: "Account could not be created. Please try again.",
+                color: "#f00"
+            };
+            setSnackbarAlert(alert);
+            setLoading(false);
+        }
+    }
+
+    const createPdf = () => {
+        var imgData = data;
+        var doc = new jsPDF({
+            orientation: "landscape",
+            format: [1920, 1080],
+            unit: "px"
+        })
+        doc.addImage(imgData, 'JPEG', 0, 0, 1920, 1080);
+
+        doc.setFillColor(187, 187, 187);
+        doc.roundedRect(605, 180, 1070, 50, 5, 5, "F");
+
+        doc.setLineWidth(1)
+        doc.setDrawColor(0)
+        doc.setFillColor(255, 59, 71)
+        doc.circle(620, 195, 7, "FD")
+
+        doc.setFillColor(255, 193, 0)
+        doc.circle(640, 195, 7, "FD")
+
+        doc.setFillColor(0, 215, 66)
+        doc.circle(660, 195, 7, "FD")
+
+        doc.setFont("Courier");//Master Key: XxSGaMHD1Cv5PcM8Np8Jc72e32e8328fe1d9e904c4a97ae 95925e4a98dca59bcebbad8f9fd2714c42848[Kag0p5r?(]$5B(]asdasd    
+        doc.setFontSize(30)
+        doc.text(980, 200, "Terminal-- -bash --80x24")
+
+        doc.setLineWidth(0);
+        doc.setFillColor(21, 21, 21);
+        doc.rect(605, 210, 1070, 545, "F");
+        doc.roundedRect(605, 210, 1070, 550, 5, 5, "F");
+
+        var index = Math.ceil(shortKey.length / 2) + 24;
+
+        doc.setTextColor(255, 255, 255)
+        doc.text(630, 270, "Passign:~ anonymous-user$ login -info")
+        doc.text(630, 310, "Master Key: " + account.id + encryptionKey.slice(0, index))
+        doc.text(630, 350, encryptionKey.slice(index))
+        doc.text(630, 390, "Short Key: " + shortKey)
+        doc.text(630, 430, "Website: ")
+        doc.text(630, 510, "Passign:~ anonymous-user$ contact -info")
+        doc.text(630, 550, "Email: ahmetoguzperdahci@gmail.com")
+        doc.text(630, 590, "Linkedin: www.linkedin.com/in/aoguzperdahci")
+        doc.link(760, 575, 450, 20, { url: "https://www.linkedin.com/in/aoguzperdahci/" });
+        doc.text(630, 630, "Github: www.github.com/aoguzperdahci")
+        doc.link(735, 615, 380, 20, { url: "https://github.com/aoguzperdahci" });
+        doc.text(630, 710, "Passign:~ anonymous-user$ |")
+
+        doc.save("Passign.pdf")
     }
 
     return (
-        <div className={classes.paper}>
-            <Container component="main" maxWidth="xs">
+        <Container component="main" maxWidth="xs">
+            <div className={classes.paper}>
+                <Avatar className={classes.avatar}>
+                </Avatar>
+                <Typography component="h1" variant="h5">
+                    Sign up
+                </Typography>
                 <form className={classes.form} noValidate onSubmit={handleSubmit}>
                     <Box>
                         <TextField
@@ -131,11 +188,11 @@ const Signup = ({ create, account }) => {
                             margin="normal"
                             fullWidth
                             name="shortKey"
-                            label="Short Key"
+                            label="Short key"
                             type="text"
                             id="shortKey"
                             autoComplete="off"
-                            helperText="Please enter a 6 character long rememberable key"
+                            helperText="Please enter a memorable short key of at least 4 characters long."
                             onChange={changeHandler}
                         />
                     </Box>
@@ -180,36 +237,36 @@ const Signup = ({ create, account }) => {
                     </Grid>
                 </form>
 
-                <Dialog open={account.id} onClose={handleClose} className={classes.paper}>
-                    <Box style={{width: 500}}>
-                    <DialogTitle>Account Created</DialogTitle>
-                    <DialogContent>
-                        <TextField
-                            autoFocus
-                            margin="normal"
-                            id="masterKey"
-                            label="Master Key"
-                            type="text"
-                            fullWidth
-                            variant="outlined"
-                            disabled="true"
-                            value={ account.id + encryptionKey }
-                            InputProps={{
-                                endAdornment: (
-                                <IconButton onClick={() => copyToClipboard(account.id + encryptionKey)} className={classes.button}>
-                                    <span style={{ fontSize: 30 }} className="material-icons md-48">content_copy</span>
-                                </IconButton>),
-                            }}
-                        />
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={handleClose}>Log in</Button>
-                    </DialogActions>
+                <Dialog open={account.id !== ""} onClose={handleClose} className={classes.paper}>
+                    <Box style={{ width: 500 }}>
+                        <DialogTitle>Account Created</DialogTitle>
+                        <DialogContent>
+                            <TextField
+                                autoFocus
+                                margin="normal"
+                                id="masterKey"
+                                label="Master Key"
+                                type="text"
+                                fullWidth
+                                variant="outlined"
+                                disabled={true}
+                                value={account.id + encryptionKey}
+                                InputProps={{
+                                    endAdornment: (
+                                        <IconButton onClick={() => copyToClipboard(account.id + encryptionKey)} className={classes.button}>
+                                            <span style={{ fontSize: 30 }} className="material-icons md-48">content_copy</span>
+                                        </IconButton>),
+                                }}
+                            />
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleClose}>Log in</Button>
+                        </DialogActions>
                     </Box>
                 </Dialog>
 
-            </Container>
-        </div>
+            </div>
+        </Container>
     )
 }
 
@@ -222,6 +279,7 @@ const mapStateToProps = state => {
 function mapDispatchToProps(dispatch) {
     return {
         create: (authorizationToken) => { dispatch(createAccount(authorizationToken)) },
+        setSnackbarAlert: (state) => { dispatch(setSnackbar(state)) },
     }
 }
 

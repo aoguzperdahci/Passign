@@ -1,20 +1,16 @@
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { createStyles, makeStyles } from '@mui/styles';
-import { green, blue } from "@mui/material/colors";
-import Header from './Header';
-import PasswordList from './PasswordList';
-import DetailHeader from "./DetailHeader";
+import { createTheme, ThemeProvider } from '@material-ui/core/styles';
+import { green, blue } from "@material-ui/core/colors";
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
-import PasswordDetail from './PasswordDetail';
-import { Hidden } from "@mui/material";
-import CssBaseline from '@mui/material/CssBaseline';
+import CssBaseline from '@material-ui/core/CssBaseline';
 import { connect } from "react-redux";
-import MainPage from './MainPage';
-import SignupPage from './SignupPage';
-import LoginPage from './LoginPage';
+import MainPage from '../pages/MainPage';
+import SignupPage from '../pages/SignupPage';
+import LoginPage from '../pages/LoginPage';
+import SnackbarAlert from './SnackbarAlert';
+import RecordsDetailPage from '../pages/RecordsDetailPage';
+import RecordsPage from '../pages/RecordsPage';
 
-const useStyles = makeStyles((theme) =>
-createStyles({
+const theme = createTheme(({
   typography: {
     h1: {
       fontSize: "3rem"
@@ -31,46 +27,38 @@ createStyles({
   }
 }));
 
-const theme = createTheme();
-
-
 function App({ loginState }) {
   return (
     <BrowserRouter>
       <div className="App">
         <ThemeProvider theme={theme}>
           <CssBaseline />
+          
           <Switch>
 
             <Route path="/" exact>
-              {loginState.state ? <Redirect to="/passwords" /> : <MainPage />}
+              {loginState.state ? <Redirect to="/records" /> : <MainPage />}
             </Route>
 
             <Route path="/login" exact>
-            {loginState.state ? <Redirect to="/passwords" /> : <LoginPage />}
+            {loginState.state ? <Redirect to="/records" /> : <LoginPage />}
             </Route>
 
             <Route path="/signup" exact>
-            {loginState.state ? <Redirect to="/passwords" /> : <SignupPage />}
+            {loginState.state ? <Redirect to="/records" /> : <SignupPage />}
             </Route>
 
-            <Route exact path="/passwords">
-              <Header />
-              <PasswordList/>
+            <Route exact path="/records">
+            {loginState.state ?  <RecordsPage /> : <Redirect to="/login" />}
             </Route>
 
-            <Route path="/passwords/:id">
-              <Hidden smDown>
-                <Header />
-                <PasswordList/>
-              </Hidden>
-              <Hidden mdUp>
-                <DetailHeader />
-                <PasswordDetail/>
-              </Hidden>
+            <Route path="/records/:id">
+            {loginState.state ?  <RecordsDetailPage /> : <Redirect to="/login" />}
             </Route>
             
           </Switch>
+
+          <SnackbarAlert/>
 
         </ThemeProvider>
       </div>

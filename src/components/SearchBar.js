@@ -1,21 +1,21 @@
-import Paper from "@mui/material/Paper";
-import PropTypes from 'prop-types';
-import React, {useState} from "react";
-import InputBase from "@mui/material/InputBase";
-import {makeStyles} from "@mui/styles";
-import IconButton from "@mui/material/IconButton";
-import { Box } from "@mui/material";
+import Paper from "@material-ui/core/Paper";
+import React from "react";
+import InputBase from "@material-ui/core/InputBase";
+import { makeStyles } from "@material-ui/core";
+import IconButton from "@material-ui/core/IconButton";
+import { Box } from "@material-ui/core";
+import { connect } from "react-redux";
+import { setRecordsVisible } from "../redux/actions/recordActions";
+import { setSearchText } from "../redux/actions/searchActions";
 
 const useStyles = makeStyles(theme => ({
     searchBarContainer: {
         marginTop: theme.spacing(3),
-        marginRight: theme.spacing(3),
-        marginLeft: theme.spacing.apply(1),
         display: 'flex',
         alignItems: 'center',
     },
     searchInput: {
-        marginLeft: '8px',
+        marginLeft: 10,
         flex: 1
     },
     searchButton: {
@@ -23,20 +23,23 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-const SearchBar = ({onSearch, disabled}) => {
+const SearchBar = ({ recordsVisible, setRecordsVisibleState, searchText, setSearchTextState }) => {
     const classes = useStyles();
-    const [searchText, setSearchText] = useState();
 
     const handleSearchTextChange = event => {
-        setSearchText(event.target.value);
+        var text = event.target.value;
+        setSearchTextState(text);
+        var records = recordsVisible.map(record => search(record, text));
+        setRecordsVisibleState(records);
     }
 
-    const handleKeyPress = event => {
-        if (event.key === 'Enter' && onSearch) onSearch(searchText);
-    }
-
-    const handleSearchButton = () => {
-        if (onSearch) onSearch(searchText);
+    const search = (record, text) => {
+        if (record.website.includes(text)) {
+            record.visible = true;
+        } else {
+            record.visible = false;
+        }
+        return record;
     }
 
     return (
@@ -46,21 +49,28 @@ const SearchBar = ({onSearch, disabled}) => {
                     className={classes.searchInput}
                     placeholder="Search for a record by website"
                     onChange={handleSearchTextChange}
-                    onKeyPress={handleKeyPress}
-                    disabled={disabled}
+                    value={searchText}
                 />
-                <IconButton className={classes.searchButton} onClick={handleSearchButton} aria-label="search">
-                <span className="material-icons md-48">search</span>
+                <IconButton className={classes.searchButton} aria-label="search">
+                    <span className="material-icons md-48">search</span>
                 </IconButton>
             </Paper>
-            </Box>
+        </Box>
     )
 }
 
-SearchBar.propTypes = {
-    onSearch: PropTypes.func,
-    disabled: PropTypes.bool,
-    className: PropTypes.string
+const mapStateToProps = state => {
+    return {
+        recordsVisible: state.recordsVisibleReducer,
+        searchText: state.searchTextReducer
+    };
 }
 
-export default SearchBar;
+function mapDispatchToProps(dispatch) {
+    return {
+        setRecordsVisibleState: (records) => { dispatch(setRecordsVisible(records)) },
+        setSearchTextState: (text) => { dispatch(setSearchText(text)) },
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SearchBar);

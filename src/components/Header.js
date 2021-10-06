@@ -6,13 +6,14 @@ import {
   Typography,
   Container,
   IconButton,
-  CircularProgress
-} from "@mui/material";
-import { makeStyles } from "@mui/styles";
+  CircularProgress,
+} from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
 import { Link } from "react-router-dom"
 import { connect } from "react-redux";
 import { setEditMode } from "../redux/actions/editModeActions";
 import { setRecordsVisible, updateRecords } from "../redux/actions/recordActions";
+import { setUpdateLoading } from "../redux/actions/loadingActions";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -24,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const Header = ({ loginState, records, recordsVisible, encryptionKey, setEditState, editMode, setRecordsVisibleState, updateRecordsState }) => {
+const Header = ({ loginState, records, recordsVisible, encryptionKey, setEditState, editMode, setRecordsVisibleState, updateRecordsState, loading, setLoading }) => {
   const classes = useStyles();
 
   const enterEditMode = () => {
@@ -37,6 +38,7 @@ const Header = ({ loginState, records, recordsVisible, encryptionKey, setEditSta
   }
 
   const saveChanges = () => {
+    setLoading(true);
     updateRecordsState(loginState.id, loginState.authorization, recordsVisible, encryptionKey);
   }
 
@@ -62,8 +64,8 @@ const Header = ({ loginState, records, recordsVisible, encryptionKey, setEditSta
 
   const loggedinState = () => (
     <>
-      <Box onClick={() => enterEditMode()} style={{ textDecoration: "none" }} className="wrapper">
-        <IconButton className="icon cyan" >
+      <Box style={{ textDecoration: "none" }} className="wrapper">
+        <IconButton onClick={() => enterEditMode()} className="icon cyan" >
           <Typography variant="subtitle2" className="tooltip">
             Edit
           </Typography>
@@ -71,31 +73,12 @@ const Header = ({ loginState, records, recordsVisible, encryptionKey, setEditSta
         </IconButton>
       </Box>
 
-      <Box onClick={() => logOut()} style={{ textDecoration: "none" }} className="wrapper">
-        <IconButton className="icon red">
+      <Box style={{ textDecoration: "none" }} className="wrapper">
+        <IconButton onClick={() => logOut()} className="icon red">
           <Typography variant="subtitle2" className="tooltip">
             Log out
           </Typography>
           <span className="material-icons md-48">logout</span>
-        </IconButton>
-      </Box>
-
-      <Box style={{ textDecoration: "none" }} className="wrapper">
-        <IconButton className="icon red">
-          <Typography variant="subtitle2" className="tooltip">
-            Log out
-          </Typography>
-          <span className="material-icons md-48">done</span>
-          <CircularProgress
-            size={48}
-            style={{
-              color: "#ffffff",
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              marginTop: -24,
-              marginLeft: -24,
-            }} />
         </IconButton>
       </Box>
 
@@ -104,9 +87,9 @@ const Header = ({ loginState, records, recordsVisible, encryptionKey, setEditSta
 
   const editState = () => (
     <>
-      <Link to={"/passwords/" + recordsVisible.length} style={{ textDecoration: "none" }}>
-        <Box onClick={() => addNew()} style={{ textDecoration: "none" }} className="wrapper">
-          <IconButton className="icon white">
+      <Link to={"/records/" + recordsVisible.length} style={{ textDecoration: "none" }}>
+        <Box className="wrapper">
+          <IconButton onClick={() => addNew()} className="icon white" disabled={loading}>
             <Typography variant="subtitle2" className="tooltip">
               Add new
             </Typography>
@@ -115,9 +98,9 @@ const Header = ({ loginState, records, recordsVisible, encryptionKey, setEditSta
         </Box>
       </Link>
 
-      <Link to="/passwords" style={{ textDecoration: "none" }}>
-        <Box onClick={() => discardChanges()} style={{ textDecoration: "none" }} className="wrapper">
-          <IconButton className="icon red">
+      <Link to="/records" style={{ textDecoration: "none" }}>
+        <Box style={{ textDecoration: "none" }} className="wrapper">
+          <IconButton onClick={() => discardChanges()} className="icon red" disabled={loading}>
             <Typography variant="subtitle2" className="tooltip">
               Discard changes
             </Typography>
@@ -126,13 +109,23 @@ const Header = ({ loginState, records, recordsVisible, encryptionKey, setEditSta
         </Box>
       </Link>
 
-      <Link to="/passwords" style={{ textDecoration: "none" }}>
-        <Box onClick={() => saveChanges()} style={{ textDecoration: "none" }} className="wrapper">
-          <IconButton className="icon cyan">
+      <Link to="/records" style={{ textDecoration: "none" }}>
+        <Box style={{ textDecoration: "none" }} className="wrapper">
+          <IconButton onClick={() => saveChanges()} className="icon cyan" disabled={loading}>
             <Typography variant="subtitle2" className="tooltip">
               Save changes
             </Typography>
             <span className="material-icons md-48">done</span>
+            {  loading && (<CircularProgress
+            size={48}
+            style={{
+              color: "#ffffff",
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              marginTop: -24,
+              marginLeft: -24,
+            }} />)}
           </IconButton>
         </Box>
       </Link>
@@ -161,6 +154,9 @@ const Header = ({ loginState, records, recordsVisible, encryptionKey, setEditSta
           </Toolbar>
         </Container>
       </AppBar>
+
+
+
       <Box className={classes.offset} />
     </>
   );
@@ -173,6 +169,7 @@ const mapStateToProps = state => {
     records: state.recordsReducer,
     recordsVisible: state.recordsVisibleReducer,
     encryptionKey: state.encryptionKeyReducer,
+    loading: state.updateLoadingReducer
   };
 }
 
@@ -181,6 +178,7 @@ function mapDispatchToProps(dispatch) {
     setEditState: (state) => { dispatch(setEditMode(state)) },
     setRecordsVisibleState: (records) => { dispatch(setRecordsVisible(records)) },
     updateRecordsState: (id, authorization, records, key) => { dispatch(updateRecords(id, authorization, records, key)) },
+    setLoading: (state) => { dispatch(setUpdateLoading(state)) },
   }
 }
 

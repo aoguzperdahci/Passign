@@ -1,10 +1,8 @@
-import React from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { makeStyles } from '@mui/styles';
-import { Box, Button, Hidden, IconButton, TextField, Typography, Tooltip, Snackbar } from "@mui/material";
+import React from 'react';
+import { Box, Button, IconButton, TextField, Typography, Tooltip ,makeStyles } from "@material-ui/core";
+import { useParams, Link } from 'react-router-dom';
 import { connect } from "react-redux";
 import { setRecordsVisible } from "../redux/actions/recordActions";
-
 
 const useStyles = makeStyles((theme) => ({
     main: {
@@ -53,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
 
 //const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-const PasswordDetail = ({ records, editMode, setRecordsVisibleState }) => {
+const RecordDetail = ({ recordsVisible, editMode, setRecordsVisibleState, updateFailed, setUpdateError }) => {
 
     const { id } = useParams();
     const classes = useStyles();
@@ -74,8 +72,8 @@ const PasswordDetail = ({ records, editMode, setRecordsVisibleState }) => {
     };
 
     const handleClickPasswordGenerate = () => {
-        records[id].password = generatePassword();
-        setRecordsVisibleState(records);
+        recordsVisible[id].password = generatePassword();
+        setRecordsVisibleState(recordsVisible);
     };
 
     const generatePassword = () => {
@@ -105,32 +103,23 @@ const PasswordDetail = ({ records, editMode, setRecordsVisibleState }) => {
     }
 
     const handleClickDelete = () => {
-        records[id] = {};
-        setRecordsVisible(records);
-    }
-
-    const handleAlertClose = () => {
-        console.log("alert close")
-    }
-
-    const handleAlertOpen =  () => {
-        console.log("alert open")
-        return true;
+        recordsVisible[id] = {};
+        setRecordsVisible(recordsVisible);
     }
 
     const changeHandler = (event) => {
         switch (event.target.name) {
             case "website":
-                records[id].website = event.target.value;
-                setRecordsVisibleState(records);
+                recordsVisible[id].website = event.target.value;
+                setRecordsVisibleState(recordsVisible);
                 break;
             case "username":
-                records[id].username = event.target.value;
-                setRecordsVisibleState(records);
+                recordsVisible[id].username = event.target.value;
+                setRecordsVisibleState(recordsVisible);
                 break;
-            case "password":
-                records[id].password = event.target.value;
-                setRecordsVisibleState(records);
+            case "private":
+                recordsVisible[id].password = event.target.value;
+                setRecordsVisibleState(recordsVisible);
                 break;
             default:
                 break;
@@ -157,11 +146,11 @@ const PasswordDetail = ({ records, editMode, setRecordsVisibleState }) => {
                             autoComplete="off"
                             disabled={!editMode}
                             className={classes.textField}
-                            value={records[id]?.website}
+                            value={recordsVisible[id]?.website}
                             onChange={changeHandler}
                         />
                         <Tooltip title={<Typography variant="subtitle2">Open</Typography>}>
-                            <IconButton onClick={() => openInNewTab(records[id]?.website)} className={classes.button}>
+                            <IconButton onClick={() => openInNewTab(recordsVisible[id]?.website)} className={classes.button}>
                                 <span style={{ fontSize: 35 }} className="material-icons md-48">open_in_new</span>
                             </IconButton>
                         </Tooltip>
@@ -184,11 +173,11 @@ const PasswordDetail = ({ records, editMode, setRecordsVisibleState }) => {
                             autoComplete="off"
                             disabled={!editMode}
                             className={classes.textField}
-                            value={records[id]?.username}
+                            value={recordsVisible[id]?.username}
                             onChange={changeHandler}
                         />
                         <Tooltip title={<Typography variant="subtitle2">Copy</Typography>}>
-                            <IconButton onClick={() => copyToClipboard(records[id].username)} className={classes.button}>
+                            <IconButton onClick={() => copyToClipboard(recordsVisible[id].username)} className={classes.button}>
                                 <span style={{ fontSize: 35 }} className="material-icons md-48">content_copy</span>
                             </IconButton>
                         </Tooltip>
@@ -205,13 +194,13 @@ const PasswordDetail = ({ records, editMode, setRecordsVisibleState }) => {
                         <TextField
                             variant="outlined"
                             margin="normal"
-                            name="password"
+                            name="private"
                             type={editMode || showPassword ? 'text' : 'password'}
-                            id="password"
+                            id="private"
                             autoComplete="off"
                             disabled={!editMode}
                             className={classes.textField}
-                            value={records[id]?.password}
+                            value={recordsVisible[id]?.password}
                             onChange={changeHandler}
                             InputProps={{
                                 endAdornment: editMode ? (
@@ -231,14 +220,14 @@ const PasswordDetail = ({ records, editMode, setRecordsVisibleState }) => {
                             }}
                         />
                         <Tooltip title={<Typography variant="subtitle2">Copy</Typography>}>
-                            <IconButton onClick={() => copyToClipboard(records[id].password)} className={classes.button}>
+                            <IconButton onClick={() => copyToClipboard(recordsVisible[id].password)} className={classes.button}>
                                 <span style={{ fontSize: 35 }} className="material-icons md-48">content_copy</span>
                             </IconButton>
                         </Tooltip>
                     </Box>
                     <Box style={{ margin: "auto", width: 200 }}>
                         {editMode &&
-                            <Link to="/passwords" style={{ textDecoration: "none" }}>
+                            <Link to="/records" style={{ textDecoration: "none" }}>
                                 <Button
                                     fullWidth
                                     variant="contained"
@@ -252,11 +241,6 @@ const PasswordDetail = ({ records, editMode, setRecordsVisibleState }) => {
                             </Link>}
                     </Box>
                 </form>
-                <Snackbar open={showPassword && handleAlertOpen()} autoHideDuration={6000} onClose={handleAlertClose}>
-                    <Box onClose={handleAlertClose} color="success" sx={{ width: '100%' }}>
-                        This is a success message!
-                    </Box>
-                </Snackbar>
             </Box>
         </Box>
     )
@@ -264,7 +248,7 @@ const PasswordDetail = ({ records, editMode, setRecordsVisibleState }) => {
 
 const mapStateToProps = state => {
     return {
-        records: state.recordsVisibleReducer,
+        recordsVisible: state.recordsVisibleReducer,
         editMode: state.editModeReducer,
         loginState: state.accountReducer,
     };
@@ -272,8 +256,8 @@ const mapStateToProps = state => {
 
 function mapDispatchToProps(dispatch) {
     return {
-        setRecordsVisibleState: (records) => { dispatch(setRecordsVisible(records)) }
+        setRecordsVisibleState: (records) => { dispatch(setRecordsVisible(records)) },
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PasswordDetail);
+export default connect(mapStateToProps, mapDispatchToProps)(RecordDetail);

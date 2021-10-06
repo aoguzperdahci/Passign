@@ -1,8 +1,8 @@
-import IconButton from "@mui/material/IconButton";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
+import IconButton from "@material-ui/core/IconButton";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
 import { Link } from "react-router-dom"
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@material-ui/core';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -33,7 +33,7 @@ const DetailHeader = () => {
         <div>
             <AppBar position="static">
                 <Toolbar>
-                    <Link to="/passwords" style={{ color: "white", fontSize: 48, textDecoration: "none" }}>
+                    <Link to="/records" style={{ color: "white", fontSize: 48, textDecoration: "none" }}>
                         <IconButton className={classes.menuButton}>
                             <span class="material-icons md-48">arrow_back</span>
                         </IconButton>

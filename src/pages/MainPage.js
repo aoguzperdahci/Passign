@@ -1,9 +1,7 @@
-import React from 'react'
-import Header from './Header'
-import { connect } from "react-redux";
+import React from 'react';
 import CryptoJS from 'crypto-js';
-import { setLoginState } from "../redux/actions/accountActions";
-import { getRecords } from "../redux/actions/recordActions"
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 const MainPage = ({ login, loginState }) => {
 
@@ -18,32 +16,18 @@ const MainPage = ({ login, loginState }) => {
         //console.log("e:" + e);
         //console.log("p:" + p);
         var hash = CryptoJS.HmacSHA512("a?qJO({mY!", "dffea8e770030d692a4d9a02c3b5080a7d1fb98a7d55c051e78e83ff7512a0a4");
-        console.log(hash.toString());
-
+        //console.log(hash.toString());
     }
-
-
-
 
     return (
         <div>
             <Header />
-            <div style={{ backgroundColor: "blue", width: "100%", height: 500 }} onClick={() => test()} />
-            <div></div>
+            <div style={{ backgroundColor: "blue", width: "100%", height: 1000 }} onClick={() => test()} />
+            <div style={{marginBottom: 20}}>
+                <Footer />
+            </div>
         </div>
     )
 }
 
-const mapStateToProps = state => {
-    return {
-
-    };
-}
-
-function mapDispatchToProps(dispatch) {
-    return {
-
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(MainPage);
+export default MainPage;

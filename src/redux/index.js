@@ -5,6 +5,10 @@ import encryptionKeyReducer from "./reducers/encryptionKeyReducer"
 import recordsReducer from "./reducers/recordsReducer"
 import recordsVisibleReducer from "./reducers/recordsVisibleReducer"
 import rememberMeReducer from "./reducers/rememberMeReducer"
+import searchTextReducer from "./reducers/searchTextReducer"
+import snackbarReducer from "./reducers/snackbarReducer"
+import loginLoadingReducer from "./reducers/loginLoadingReducer"
+import updateLoadingReducer from "./reducers/updateLoadingReducer"
 
 const rootReducer = combineReducers({
     accountReducer,
@@ -12,7 +16,11 @@ const rootReducer = combineReducers({
     encryptionKeyReducer,
     recordsReducer,
     recordsVisibleReducer,
-    rememberMeReducer
+    rememberMeReducer,
+    searchTextReducer,
+    snackbarReducer,
+    loginLoadingReducer,
+    updateLoadingReducer
 })
 
 export default rootReducer;

@@ -1,26 +1,17 @@
 import React from 'react';
-import { Avatar, IconButton, Button, TextField, FormControlLabel, Grid, Box, Typography, Container, Switch, CircularProgress } from '@mui/material';
+import { Avatar, IconButton, Button, TextField, FormControlLabel, Grid, Box, Typography, Container, Switch, CircularProgress } from '@material-ui/core';
 import { Link } from 'react-router-dom';
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from '@material-ui/core';
 import { connect } from "react-redux";
 import { useState } from 'react';
 import { getRecords } from "../redux/actions/recordActions"
 import { setRememberMe } from "../redux/actions/rememberMeActions"
 import CryptoJS from 'crypto-js';
+import { setLoginLoading } from "../redux/actions/loadingActions"
+import { setSnackbar } from '../redux/actions/snackbarActions';
 
-function Copyright() {
-    return (
-        <Typography variant="body2" color="textSecondary" align="center">
-            {'Copyright © '}
-            <Link color="inherit" href="https://material-ui.com/">
-                Your Website
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
 
+//XxSGaMHD1Cv5PcM8Np8Jc72e32e8328fe1d9e904c4a97ae95925e4a98dca59bcebbad8f9fd2714c42848[Kag0p5r?(]$5B(]asdasd
 const useStyles = makeStyles((theme) => ({
     paper: {
         marginTop: theme.spacing(15),
@@ -51,13 +42,12 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function Login({ login, loginState, rememberMeState, setRememberMeState }) {
+function Login({ login, rememberMeState, setRememberMeState, loading, setLoading, setSnackbarAlert }) {
     const classes = useStyles();
     const [masterKey, setMasterKey] = useState("");
     const [username, setUsername] = useState("");
     const [shortKey, setShortKey] = useState("");
     const [rememberMe, setRememberMe] = useState(false)
-    const [loading, setLoading] = useState(false);
 
     const changeHandler = (event) => {
         switch (event.target.name) {
@@ -72,57 +62,76 @@ function Login({ login, loginState, rememberMeState, setRememberMeState }) {
                 break;
             case "shortKey":
                 setShortKey(event.target.value);
+                break;
             default:
                 break;
         }
     }
 
-    const handleLogin = async (event) => {//IJeMB3J0VM6V5N48hOBi fefd0180993eaf16b633c3d6458a6689420cda87bb51200707d029abbe665b3d asdasd Ae2lP$=j#<XM6r5LEm
-        // IJeMB3J0VM6V5N48hOBifefd0180993eaf16b633c3d6458a6689420cda87bb51200707d029abbe665b3dasdasdAe2lP$=j#<XM6r5LEm
+    const handleLogin = async (event) => {
         event.preventDefault();
-        setLoading(true);
-        var id = masterKey.slice(0, 20);
-        var salt = masterKey.slice(20, 84);
-        var passPhrase = masterKey.slice(84, 90);
-        var authPhrase = masterKey.slice(90);
-        var generatedKey = CryptoJS.PBKDF2(passPhrase, salt, { keySize: 8, iterations: 1000 });
-        var key = CryptoJS.enc.Hex.stringify(generatedKey);
-        var authorization = CryptoJS.HmacSHA512(authPhrase, key).toString();
-        var hash = CryptoJS.SHA256(passPhrase).toString();
-        var token = CryptoJS.AES.encrypt(id + salt + authPhrase, hash).toString();
-        var newRememberMe = {
-            state: rememberMe,
-            username: username,
-            token: token
+        try {
+            setLoading(true);
+            if (masterKey.length < 104) {
+                throw masterKey;
+            }
+            var id = masterKey.slice(0, 20);
+            var salt = masterKey.slice(20, 84);
+            var authPhrase = masterKey.slice(84, 100);
+            var passPhrase = masterKey.slice(100);
+            var generatedKey = CryptoJS.PBKDF2(passPhrase, salt, { keySize: 8, iterations: 1000 });
+            var key = CryptoJS.enc.Hex.stringify(generatedKey);
+            var authorization = CryptoJS.HmacSHA512(authPhrase, key).toString();
+            var hash = CryptoJS.SHA256(passPhrase).toString();
+            var token = CryptoJS.AES.encrypt(id + salt + authPhrase, hash).toString();
+            var newRememberMe = {
+                state: rememberMe,
+                username: username,
+                token: token
+            }
+            login(id, authorization, key, newRememberMe);
+        } catch (error) {
+            var alert = {
+                show: true,
+                message: "Login attempt failed. Please try again.",
+                color:"#f00"
+            };
+            setSnackbarAlert(alert);
+            setLoading(false);
         }
-        login(id, authorization, key, newRememberMe);
-        //alert messages
-        //console.log(key)
-        //console.log(id)
-        //console.log(salt)
-        //console.log(passPhrase)
-        //console.log(authPhrase)
-        //console.log(authorization)
     }
 
     const handleLoginRememberMe = (event) => {
         event.preventDefault();
-        setLoading(true);
-        var token = rememberMeState.token;
-        var hash = CryptoJS.SHA256(shortKey).toString();
-        var decrypted = CryptoJS.AES.decrypt(token, hash).toString(CryptoJS.enc.Utf8);
-        var id = decrypted.slice(0, 20);
-        var salt = decrypted.slice(20, 84);
-        var authPhrase = decrypted.slice(84);
-        var generatedKey = CryptoJS.PBKDF2(shortKey, salt, { keySize: 8, iterations: 1000 });
-        var key = CryptoJS.enc.Hex.stringify(generatedKey);
-        var authorization = CryptoJS.HmacSHA512(authPhrase, key).toString();
-        var newRememberMe = {
-            state: true,
-            username: rememberMeState.username,
-            token: rememberMeState.token
+        try {
+            setLoading(true);
+            if (shortKey.length < 4) {
+                throw shortKey;
+            }
+            var token = rememberMeState.token;
+            var hash = CryptoJS.SHA256(shortKey).toString();
+            var decrypted = CryptoJS.AES.decrypt(token, hash).toString(CryptoJS.enc.Utf8);
+            var id = decrypted.slice(0, 20);
+            var salt = decrypted.slice(20, 84);
+            var authPhrase = decrypted.slice(84);
+            var generatedKey = CryptoJS.PBKDF2(shortKey, salt, { keySize: 8, iterations: 1000 });
+            var key = CryptoJS.enc.Hex.stringify(generatedKey);
+            var authorization = CryptoJS.HmacSHA512(authPhrase, key).toString();
+            var newRememberMe = {
+                state: true,
+                username: rememberMeState.username,
+                token: rememberMeState.token
+            }
+            login(id, authorization, key, newRememberMe);
+        } catch (error) {
+            setSnackbarAlert({
+                show: true,
+                message: "Login attempt failed. Please try again.",
+                color:"#f00"
+            });
+            setLoading(false);
         }
-        login(id, authorization, key, newRememberMe);
+
     }
 
     async function pasteFromClipboard() {
@@ -193,7 +202,7 @@ function Login({ login, loginState, rememberMeState, setRememberMeState }) {
 
                         <Grid container>
                             <Grid item xs>
-                                <Link className={classes.link} onClick={clearRememberMeState}>
+                                <Link to="/login" className={classes.link} onClick={clearRememberMeState}>
                                     Log in as a different user
                                 </Link>
                             </Grid>
@@ -290,7 +299,7 @@ function Login({ login, loginState, rememberMeState, setRememberMeState }) {
 
                         <Grid container>
                             <Grid item xs>
-                                <Link className={classes.link} to="/passwords">
+                                <Link className={classes.link} to="/records">
                                     Log in as a different user
                                 </Link>
                             </Grid>
@@ -303,7 +312,6 @@ function Login({ login, loginState, rememberMeState, setRememberMeState }) {
                     </form>)}
             </div>
             <Box mt={8}>
-                <Copyright />
             </Box>
         </Container>
     );
@@ -311,9 +319,9 @@ function Login({ login, loginState, rememberMeState, setRememberMeState }) {
 
 const mapStateToProps = state => {
     return {
-        records: state.recordsReadReducer,
         loginState: state.accountReducer,
-        rememberMeState: state.rememberMeReducer
+        rememberMeState: state.rememberMeReducer,
+        loading: state.loginLoadingReducer
     };
 }
 
@@ -321,6 +329,8 @@ function mapDispatchToProps(dispatch) {
     return {
         login: (id, authorization, key, rememberMe) => { dispatch(getRecords(id, authorization, key, rememberMe)) },
         setRememberMeState: (state) => { dispatch(setRememberMe(state)) },
+        setLoading: (state) => { dispatch(setLoginLoading(state)) },
+        setSnackbarAlert: (state) => { dispatch(setSnackbar(state)) },
     }
 }
 

@@ -1,41 +1,38 @@
-import React from 'react'
-import Grid from '@mui/material/Grid';
-import FeedItem from "./FeedItem"
-import { Box, Hidden, Container } from "@mui/material";
+import React from 'react';
+import { Box, Hidden, Grid, makeStyles } from "@material-ui/core";
 import { useParams } from 'react-router-dom';
-import PasswordDetail from './PasswordDetail';
-import { makeStyles } from '@mui/styles';
-import SearchBar from './SearchBar';
+import RecordDetail from './RecordDetail';
 import { connect } from "react-redux";
+import SearchBar from './SearchBar';
+import FeedItem from "./FeedItem";
 
 
 const useStyles = makeStyles((theme) => ({
     box: {
-        marginLeft: theme.spacing(1),
-        marginRight: theme.spacing(3)
+        marginLeft: theme.spacing(2),
+        marginRight: theme.spacing(2)
     }
 }));
 
-const PasswordList = ({ records }) => {
+const RecordList = ({ records }) => {
 
     const { id } = useParams();
     const classes = useStyles();
 
     return (
         <React.Fragment>
-            <Grid container>
+            <Grid container style={{maxWidth: 1440, marginLeft: "auto", marginRight:"auto"}}>
                 <Grid item xs>
-                    <SearchBar />
                     <Box className={classes.box}>
+                    <SearchBar/>
                         {records.map(r => (
                             r.visible && <FeedItem key={r.id} record={r} />
                         ))}
-                        <h2></h2>
                     </Box>
                 </Grid>
                 <Hidden smDown>
                     <Grid item xs>
-                        {id && (<PasswordDetail />)}
+                        {id && (<RecordDetail />)}
                     </Grid>
                 </Hidden>
             </Grid>
@@ -55,4 +52,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PasswordList);
+export default connect(mapStateToProps, mapDispatchToProps)(RecordList);

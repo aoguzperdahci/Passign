@@ -1,5 +1,6 @@
 const getRememberMe = () => {
     var state = localStorage.getItem("rememberMeState");
+    state = (state === "true");
     var usename = "";
     var token = "";
     if (state) {
@@ -22,8 +23,13 @@ export default {
     rememberMe: getRememberMe(),
     encryptionKey: "",
     editMode: false,
-    updateLoading: false,
-    loginErrorMessage: "",
-    updateErrorMessage: "",
+    searchText: "",
+    snackbar:{
+        show: false,
+        message:"",
+        color:""
+    },
+    loginLoading: false,
+    updateLoading: false
 }
 
