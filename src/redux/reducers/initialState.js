@@ -12,7 +12,7 @@ const getRememberMe = () => {
     return {state: state, username: usename, token: token};
 }
 
-export default {
+var initialState = {
     records: [],
     recordsVisible: [],
     login: {
@@ -31,5 +31,7 @@ export default {
     },
     loginLoading: false,
     updateLoading: false
-}
+};
+
+export default initialState;
 

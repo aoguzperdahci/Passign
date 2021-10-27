@@ -4,12 +4,11 @@ import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core';
 import { connect } from "react-redux";
 import { useState } from 'react';
+import CryptoJS from 'crypto-js';
 import { getRecords } from "../redux/actions/recordActions"
 import { setRememberMe } from "../redux/actions/rememberMeActions"
-import CryptoJS from 'crypto-js';
 import { setLoginLoading } from "../redux/actions/loadingActions"
 import { setSnackbar } from '../redux/actions/snackbarActions';
-
 
 //XxSGaMHD1Cv5PcM8Np8Jc72e32e8328fe1d9e904c4a97ae95925e4a98dca59bcebbad8f9fd2714c42848[Kag0p5r?(]$5B(]asdasd
 const useStyles = makeStyles((theme) => ({
@@ -25,9 +24,15 @@ const useStyles = makeStyles((theme) => ({
     },
     form: {
         marginTop: theme.spacing(2),
+        [theme.breakpoints.down('sm')]: {
+            width: 350
+          },
+          [theme.breakpoints.up('sm')]: {
+            width: 400
+          },
     },
     submit: {
-        margin: theme.spacing(3, 0, 2),
+        margin: theme.spacing(3, 0, 3),
     },
     box: {
         position: "relative",
@@ -47,7 +52,8 @@ function Login({ login, rememberMeState, setRememberMeState, loading, setLoading
     const [masterKey, setMasterKey] = useState("");
     const [username, setUsername] = useState("");
     const [shortKey, setShortKey] = useState("");
-    const [rememberMe, setRememberMe] = useState(false)
+    const [rememberMe, setRememberMe] = useState(false);
+    const [pasteShow, setPasteShow] = useState(true);
 
     const changeHandler = (event) => {
         switch (event.target.name) {
@@ -72,13 +78,21 @@ function Login({ login, rememberMeState, setRememberMeState, loading, setLoading
         event.preventDefault();
         try {
             setLoading(true);
-            if (masterKey.length < 104) {
+            if (masterKey.length < 101) {
                 throw masterKey;
             }
-            var id = masterKey.slice(0, 20);
-            var salt = masterKey.slice(20, 84);
-            var authPhrase = masterKey.slice(84, 100);
-            var passPhrase = masterKey.slice(100);
+
+            var finalKey = masterKey;
+            //fix for copying multiple lines
+            finalKey = finalKey.replace("\n", "");
+            finalKey = finalKey.replace("\n", "");
+            finalKey = finalKey.replace("\r", "");
+            finalKey = finalKey.replace("\r", "");
+
+            var id = finalKey.slice(0, 20);
+            var salt = finalKey.slice(20, 84);
+            var authPhrase = finalKey.slice(84, 100);
+            var passPhrase = finalKey.slice(100);
             var generatedKey = CryptoJS.PBKDF2(passPhrase, salt, { keySize: 8, iterations: 1000 });
             var key = CryptoJS.enc.Hex.stringify(generatedKey);
             var authorization = CryptoJS.HmacSHA512(authPhrase, key).toString();
@@ -94,7 +108,7 @@ function Login({ login, rememberMeState, setRememberMeState, loading, setLoading
             var alert = {
                 show: true,
                 message: "Login attempt failed. Please try again.",
-                color:"#f00"
+                color: "#f00"
             };
             setSnackbarAlert(alert);
             setLoading(false);
@@ -127,7 +141,7 @@ function Login({ login, rememberMeState, setRememberMeState, loading, setLoading
             setSnackbarAlert({
                 show: true,
                 message: "Login attempt failed. Please try again.",
-                color:"#f00"
+                color: "#f00"
             });
             setLoading(false);
         }
@@ -136,8 +150,10 @@ function Login({ login, rememberMeState, setRememberMeState, loading, setLoading
 
     async function pasteFromClipboard() {
         const text = await navigator.clipboard.readText();
+        setPasteShow(false);
         setMasterKey(text);
         await navigator.clipboard.writeText("");
+        
     }
 
     const clearRememberMeState = (event) => {
@@ -158,7 +174,7 @@ function Login({ login, rememberMeState, setRememberMeState, loading, setLoading
                     Log in {rememberMeState.state ? "as " + rememberMeState.username : ""}
                 </Typography>
                 {rememberMeState.state ? (
-                    <form className={classes.form} style={{ width: 400 }} noValidate onSubmit={handleLoginRememberMe}>
+                    <form className={classes.form} noValidate onSubmit={handleLoginRememberMe}>
                         <Box className={classes.box}>
                             <TextField
                                 variant="outlined"
@@ -200,18 +216,11 @@ function Login({ login, rememberMeState, setRememberMeState, loading, setLoading
                             )}
                         </Box>
 
-                        <Grid container>
-                            <Grid item xs>
-                                <Link to="/login" className={classes.link} onClick={clearRememberMeState}>
-                                    Log in as a different user
-                                </Link>
-                            </Grid>
-                            <Grid item>
-                                <Link to="/signup" className={classes.link}>
-                                    Don't have an account? Sign Up
-                                </Link>
-                            </Grid>
-                        </Grid>
+                        <Container align="center">
+                            <Link to="/login" className={classes.link} onClick={clearRememberMeState}>
+                                Log in as a different user
+                            </Link>
+                        </Container>
                     </form>
                 ) : (
                     <form className={classes.form} noValidate onSubmit={handleLogin}>
@@ -227,7 +236,7 @@ function Login({ login, rememberMeState, setRememberMeState, loading, setLoading
                                 autoComplete="off"
                                 onChange={changeHandler}
                                 value={masterKey}
-                                InputProps={{
+                                InputProps={pasteShow && {
                                     endAdornment: (
                                         <IconButton onClick={() => pasteFromClipboard()} className={classes.button}>
                                             <span style={{ fontSize: 30 }} className="material-icons md-48">content_paste</span>
@@ -237,6 +246,7 @@ function Login({ login, rememberMeState, setRememberMeState, loading, setLoading
 
                         </Box>
                         <Grid container>
+
                             <Grid item xs>
                                 <Box mt={3} mb={3}>
                                     <FormControlLabel
@@ -252,8 +262,8 @@ function Login({ login, rememberMeState, setRememberMeState, loading, setLoading
                                 </Box>
                             </Grid>
 
-                            <Box display="block" >
-                                <Grid item>
+                            <Grid item xs>
+                                <Box display="block" style={{ height: 50, width: "auto" }}>
                                     <TextField
                                         variant="outlined"
                                         margin="normal"
@@ -266,8 +276,8 @@ function Login({ login, rememberMeState, setRememberMeState, loading, setLoading
                                         disabled={!rememberMe}
                                         value={rememberMe ? username : ""}
                                     />
-                                </Grid>
-                            </Box>
+                                </Box>
+                            </Grid>
 
                         </Grid>
 
@@ -297,18 +307,11 @@ function Login({ login, rememberMeState, setRememberMeState, loading, setLoading
                             )}
                         </Box>
 
-                        <Grid container>
-                            <Grid item xs>
-                                <Link className={classes.link} to="/records">
-                                    Log in as a different user
-                                </Link>
-                            </Grid>
-                            <Grid item>
-                                <Link to="/signup" className={classes.link}>
-                                    Don't have an account? Sign Up
-                                </Link>
-                            </Grid>
-                        </Grid>
+                        <Container align="center">
+                            <Link to="/signup" className={classes.link}>
+                                Don't have an account? Sign Up
+                            </Link>
+                        </Container>
                     </form>)}
             </div>
             <Box mt={8}>

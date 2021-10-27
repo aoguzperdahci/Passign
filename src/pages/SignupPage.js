@@ -6,22 +6,20 @@ import Footer from '../components/Footer';
 
 const useStyles = makeStyles((theme) => ({
     footer: {
-        marginBottom:20,
+        marginBottom: 20,
         [theme.breakpoints.down('sm')]: {
+            marginTop: 120
+        },
+        [theme.breakpoints.up('sm')]: {
             marginTop: 150
-          },
-          [theme.breakpoints.up('sm')]: {
+        },
+        [theme.breakpoints.up('md')]: {
             marginTop: 200
-          },
-          [theme.breakpoints.up('md')]: {
-            marginTop: 250
-          },
-
+        },
     }
 }));
 
 const LoginPage = () => {
-
     const classes = useStyles();
 
     return (

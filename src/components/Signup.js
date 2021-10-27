@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core';
-import { Avatar, Box, TextField, Typography, Grid, Button, Container, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from '@material-ui/core';
+import { Avatar, Box, TextField, Typography, Button, Container, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress, Stepper, Step, StepLabel, StepContent } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import { connect } from "react-redux";
 import CryptoJS from 'crypto-js';
@@ -9,8 +9,6 @@ import jsPDF from 'jspdf';
 import data from "../images/pdfBackground";
 import { createAccount } from "../redux/actions/accountActions";
 import { setSnackbar } from '../redux/actions/snackbarActions';
-
-
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -24,11 +22,19 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: theme.palette.secondary.main,
     },
     form: {
-        marginTop: theme.spacing(2),
-
+        marginTop: theme.spacing(3),
+        [theme.breakpoints.down('sm')]: {
+            width: 350
+        },
+        [theme.breakpoints.up('sm')]: {
+            width: 400
+        },
+        [theme.breakpoints.up('md')]: {
+            width: 500
+        },
     },
     submit: {
-        margin: theme.spacing(3, 0, 2),
+        margin: theme.spacing(3, 0, 3),
     },
     box: {
         position: "relative",
@@ -41,6 +47,11 @@ const useStyles = makeStyles((theme) => ({
     link: {
         textDecoration: "none",
         color: theme.palette.primary.light
+    },
+    terms: {
+        "& .MuiInputBase-root.Mui-disabled": {
+            color: "#FFFFFF"
+        },
     }
 }));
 
@@ -49,6 +60,11 @@ const Signup = ({ create, account, setSnackbarAlert }) => {
     const [shortKey, setShortKey] = useState();
     const [encryptionKey, setEncryptionKey] = useState();
     const [loading, setLoading] = useState(false);
+    const [activeStep, setActiveStep] = useState(0);
+
+    const handleNext = () => {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    };
 
     useEffect(() => {
         if (account.id !== "") {
@@ -62,7 +78,22 @@ const Signup = ({ create, account, setSnackbarAlert }) => {
     };
 
     async function copyToClipboard(text) {
-        await navigator.clipboard.writeText(text);
+        var copyText = document.getElementById(text);
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        await navigator.clipboard.writeText(copyText.value);
+
+        var test = await navigator.clipboard.readText();
+        //for older browser versions
+        if(test !== copyText.value){
+            var input = document.createElement('textarea');
+            document.body.appendChild(input);
+            input.value = copyText.value;
+            input.focus();
+            input.select();
+            document.execCommand('Copy');
+            input.remove();
+        }
     }
 
     const changeHandler = (event) => {
@@ -98,7 +129,7 @@ const Signup = ({ create, account, setSnackbarAlert }) => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            if (shortKey.length < 4) {//vEnlracswbCshtvc4tcjfe8cd472c58c19cf0e2a38d7a455625a15972cc6b909edff363aa204874bc7cc*#FE=]F|w@h=]|-Fqweqwe
+            if (shortKey.length < 1) {
                 throw shortKey;
             }
             var salt = CryptoJS.lib.WordArray.random(32);
@@ -110,7 +141,7 @@ const Signup = ({ create, account, setSnackbarAlert }) => {
             setEncryptionKey(saltString + authorization + shortKey);
             setLoading(true);
             create(authorizationToken.toString());
-            //setOpen(true);
+
         } catch (error) {
             var alert = {
                 show: true,
@@ -145,7 +176,7 @@ const Signup = ({ create, account, setSnackbarAlert }) => {
         doc.setFillColor(0, 215, 66)
         doc.circle(660, 195, 7, "FD")
 
-        doc.setFont("Courier");//Master Key: XxSGaMHD1Cv5PcM8Np8Jc72e32e8328fe1d9e904c4a97ae 95925e4a98dca59bcebbad8f9fd2714c42848[Kag0p5r?(]$5B(]asdasd    
+        doc.setFont("Courier");
         doc.setFontSize(30)
         doc.text(980, 200, "Terminal-- -bash --80x24")
 
@@ -161,7 +192,8 @@ const Signup = ({ create, account, setSnackbarAlert }) => {
         doc.text(630, 310, "Master Key: " + account.id + encryptionKey.slice(0, index))
         doc.text(630, 350, encryptionKey.slice(index))
         doc.text(630, 390, "Short Key: " + shortKey)
-        doc.text(630, 430, "Website: ")
+        doc.text(630, 430, "Website: passigndev.web.app")
+        doc.link(750, 415, 250, 20, { url: "https://passigndev.web.app/login" });
         doc.text(630, 510, "Passign:~ anonymous-user$ contact -info")
         doc.text(630, 550, "Email: ahmetoguzperdahci@gmail.com")
         doc.text(630, 590, "Linkedin: www.linkedin.com/in/aoguzperdahci")
@@ -181,64 +213,105 @@ const Signup = ({ create, account, setSnackbarAlert }) => {
                 <Typography component="h1" variant="h5">
                     Sign up
                 </Typography>
-                <form className={classes.form} noValidate onSubmit={handleSubmit}>
-                    <Box>
-                        <TextField
-                            variant="outlined"
-                            margin="normal"
-                            fullWidth
-                            name="shortKey"
-                            label="Short key"
-                            type="text"
-                            id="shortKey"
-                            autoComplete="off"
-                            helperText="Please enter a memorable short key of at least 4 characters long."
-                            onChange={changeHandler}
-                        />
-                    </Box>
 
-                    <Box className={classes.box}>
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            color="primary"
-                            className={classes.submit}
-                            disabled={loading}
-                        >
-                            Sign up
-                        </Button>
-                        {loading && (
-                            <CircularProgress
-                                size={24}
-                                style={{
-                                    color: "#43a047",
-                                    position: 'absolute',
-                                    top: '50%',
-                                    left: '50%',
-                                    marginTop: -8,
-                                    marginLeft: -15,
-                                }}
-                            />
-                        )}
-                    </Box>
+                <div className={classes.form}>
+                    <Stepper activeStep={activeStep} orientation="vertical" style={{ paddingBottom: 10 }}>
 
-                    <Grid container>
-                        <Grid item xs>
-                            <Link href="#" className={classes.link}>
-                                unutma{account.id}
-                            </Link>
-                        </Grid>
-                        <Grid item>
+                        <Step key={0}>
+                            <StepLabel>Accept the terms and conditions</StepLabel>
+                            <StepContent align="center">
+
+                                <TextField
+                                    multiline
+                                    fullWidth
+                                    maxRows={10}
+                                    disabled
+                                    className={classes.terms}
+                                    value={"This app is a personal project hence we don't provide any customer support. If you would have a problem " 
+                                        + "you can still contact us but please acknowledge that we may not be able to solve it. Also, if you have a "
+                                        + "request or a complaint feel free to contact us. We keep your data safe with military-grade encryption. "
+                                        + "The data can't be decrypted without the encryption key. The encryption key is derived from your master "
+                                        + "key which only you have. The encryption key never leaves your machine. Therefore, no one, including us, "
+                                        + "can access your data. If you lose your master key there's no way to recover your lost data. The app uses "
+                                        + "local storage for easy login feature. It stores a piece of the master key in encrypted form. We advise you "
+                                        + "to watch the tutorial on the main page to have a better understanding of how to use the app. You can look "
+                                        + "github page for more technical explanation."}
+                                ></TextField>
+
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={handleNext}
+                                    style={{ marginTop: 20, padding:10 }}
+                                >
+                                    I’ve read and accept the terms &amp; conditions
+                                </Button>
+
+                            </StepContent>
+                        </Step>
+
+                        <Step key={1}>
+                            <StepLabel>Set a short key</StepLabel>
+                            <StepContent>
+
+                                <form noValidate onSubmit={handleSubmit}>
+                                    <Box>
+                                        <TextField
+                                            variant="outlined"
+                                            margin="normal"
+                                            fullWidth
+                                            name="shortKey"
+                                            label="Short key"
+                                            type="text"
+                                            id="shortKey"
+                                            autoComplete="off"
+                                            onChange={changeHandler}
+                                        />
+                                    </Box>
+
+                                    <Box className={classes.box}>
+                                        <Button
+                                            type="submit"
+                                            fullWidth
+                                            variant="contained"
+                                            color="primary"
+                                            className={classes.submit}
+                                            disabled={loading}
+                                        >
+                                            Sign up
+                                        </Button>
+                                        {loading && (
+                                            <CircularProgress
+                                                size={24}
+                                                style={{
+                                                    color: "#43a047",
+                                                    position: 'absolute',
+                                                    top: '50%',
+                                                    left: '50%',
+                                                    marginTop: -12,
+                                                    marginLeft: -12,
+                                                }}
+                                            />
+                                        )}
+                                    </Box>
+
+                                </form>
+
+                            </StepContent>
+                        </Step>
+                    </Stepper>
+
+                    <Container align="center">
+                        <Box style={{marginTop:20}}> 
                             <Link to="/login" className={classes.link}>
                                 Have an account? Log in
                             </Link>
-                        </Grid>
-                    </Grid>
-                </form>
+                        </Box>
+                    </Container>
+                </div>
 
                 <Dialog open={account.id !== ""} onClose={handleClose} className={classes.paper}>
-                    <Box style={{ width: 500 }}>
+                    <Box className={classes.form}>
                         <DialogTitle>Account Created</DialogTitle>
                         <DialogContent>
                             <TextField
@@ -253,7 +326,7 @@ const Signup = ({ create, account, setSnackbarAlert }) => {
                                 value={account.id + encryptionKey}
                                 InputProps={{
                                     endAdornment: (
-                                        <IconButton onClick={() => copyToClipboard(account.id + encryptionKey)} className={classes.button}>
+                                        <IconButton onClick={() => copyToClipboard("masterKey")} className={classes.button}>
                                             <span style={{ fontSize: 30 }} className="material-icons md-48">content_copy</span>
                                         </IconButton>),
                                 }}

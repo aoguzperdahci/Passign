@@ -34,7 +34,7 @@ const SearchBar = ({ recordsVisible, setRecordsVisibleState, searchText, setSear
     }
 
     const search = (record, text) => {
-        if (record.website.includes(text)) {
+        if (record.website.toLowerCase().includes(text.toLowerCase())) {
             record.visible = true;
         } else {
             record.visible = false;

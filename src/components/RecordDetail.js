@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, IconButton, TextField, Typography, Tooltip ,makeStyles } from "@material-ui/core";
+import { Box, Button, IconButton, TextField, Typography, Tooltip, makeStyles } from "@material-ui/core";
 import { useParams, Link } from 'react-router-dom';
 import { connect } from "react-redux";
 import { setRecordsVisible } from "../redux/actions/recordActions";
@@ -64,7 +64,22 @@ const RecordDetail = ({ recordsVisible, editMode, setRecordsVisibleState, update
     }
 
     async function copyToClipboard(text) {
-        await navigator.clipboard.writeText(text);
+        var copyText = document.getElementById(text);
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        await navigator.clipboard.writeText(copyText.value);
+
+        var test = await navigator.clipboard.readText();
+        //for older browser versions
+        if(test !== copyText.value){
+            var input = document.createElement('textarea');
+            document.body.appendChild(input);
+            input.value = copyText.value;
+            input.focus();
+            input.select();
+            document.execCommand('Copy');
+            input.remove();
+        }
     }
 
     const handleClickShowPassword = () => {
@@ -117,7 +132,7 @@ const RecordDetail = ({ recordsVisible, editMode, setRecordsVisibleState, update
                 recordsVisible[id].username = event.target.value;
                 setRecordsVisibleState(recordsVisible);
                 break;
-            case "private":
+            case "password":
                 recordsVisible[id].password = event.target.value;
                 setRecordsVisibleState(recordsVisible);
                 break;
@@ -177,7 +192,7 @@ const RecordDetail = ({ recordsVisible, editMode, setRecordsVisibleState, update
                             onChange={changeHandler}
                         />
                         <Tooltip title={<Typography variant="subtitle2">Copy</Typography>}>
-                            <IconButton onClick={() => copyToClipboard(recordsVisible[id].username)} className={classes.button}>
+                            <IconButton onClick={() => copyToClipboard("username")} className={classes.button}>
                                 <span style={{ fontSize: 35 }} className="material-icons md-48">content_copy</span>
                             </IconButton>
                         </Tooltip>
@@ -194,9 +209,9 @@ const RecordDetail = ({ recordsVisible, editMode, setRecordsVisibleState, update
                         <TextField
                             variant="outlined"
                             margin="normal"
-                            name="private"
+                            name="password"
                             type={editMode || showPassword ? 'text' : 'password'}
-                            id="private"
+                            id="password"
                             autoComplete="off"
                             disabled={!editMode}
                             className={classes.textField}
@@ -220,7 +235,7 @@ const RecordDetail = ({ recordsVisible, editMode, setRecordsVisibleState, update
                             }}
                         />
                         <Tooltip title={<Typography variant="subtitle2">Copy</Typography>}>
-                            <IconButton onClick={() => copyToClipboard(recordsVisible[id].password)} className={classes.button}>
+                            <IconButton onClick={() => copyToClipboard("password")} className={classes.button}>
                                 <span style={{ fontSize: 35 }} className="material-icons md-48">content_copy</span>
                             </IconButton>
                         </Tooltip>
