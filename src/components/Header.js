@@ -154,9 +154,7 @@ const Header = ({ loginState, records, recordsVisible, encryptionKey, setEditSta
           </Toolbar>
         </Container>
       </AppBar>
-
-
-
+      
       <Box className={classes.offset} />
     </>
   );

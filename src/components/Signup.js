@@ -132,10 +132,10 @@ const Signup = ({ create, account, setSnackbarAlert }) => {
             if (shortKey.length < 1) {
                 throw shortKey;
             }
-            var salt = CryptoJS.lib.WordArray.random(32);
-            var saltString = CryptoJS.enc.Hex.stringify(salt);
-            var generatedKey = CryptoJS.PBKDF2(shortKey, saltString, { keySize: 8, iterations: 1000 });
-            var key = CryptoJS.enc.Hex.stringify(generatedKey);
+            var salt = CryptoJS.lib.WordArray.random(48);
+            var saltString = CryptoJS.enc.Base64.stringify(salt);
+            var generatedKey = CryptoJS.PBKDF2(shortKey, saltString, { keySize: 18, iterations: 4000 });
+            var key = CryptoJS.enc.Base64.stringify(generatedKey);
             var authorization = generateAuthPhrase();
             var authorizationToken = CryptoJS.HmacSHA512(authorization, key);
             setEncryptionKey(saltString + authorization + shortKey);

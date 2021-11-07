@@ -17,9 +17,6 @@ const useStyles = makeStyles(theme => ({
     searchInput: {
         marginLeft: 10,
         flex: 1
-    },
-    searchButton: {
-
     }
 }))
 

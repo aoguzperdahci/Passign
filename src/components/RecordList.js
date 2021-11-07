@@ -43,13 +43,7 @@ const RecordList = ({ records }) => {
 const mapStateToProps = state => {
     return {
         records: state.recordsVisibleReducer,
-        loginState: state.accountReducer,
     };
 }
 
-function mapDispatchToProps(dispatch) {
-    return {
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(RecordList);
+export default connect(mapStateToProps)(RecordList);

@@ -10,7 +10,6 @@ import { setRememberMe } from "../redux/actions/rememberMeActions"
 import { setLoginLoading } from "../redux/actions/loadingActions"
 import { setSnackbar } from '../redux/actions/snackbarActions';
 
-//XxSGaMHD1Cv5PcM8Np8Jc72e32e8328fe1d9e904c4a97ae95925e4a98dca59bcebbad8f9fd2714c42848[Kag0p5r?(]$5B(]asdasd
 const useStyles = makeStyles((theme) => ({
     paper: {
         marginTop: theme.spacing(15),
@@ -93,8 +92,8 @@ function Login({ login, rememberMeState, setRememberMeState, loading, setLoading
             var salt = finalKey.slice(20, 84);
             var authPhrase = finalKey.slice(84, 100);
             var passPhrase = finalKey.slice(100);
-            var generatedKey = CryptoJS.PBKDF2(passPhrase, salt, { keySize: 8, iterations: 1000 });
-            var key = CryptoJS.enc.Hex.stringify(generatedKey);
+            var generatedKey = CryptoJS.PBKDF2(passPhrase, salt, { keySize: 18, iterations: 4000 });
+            var key = CryptoJS.enc.Base64.stringify(generatedKey);
             var authorization = CryptoJS.HmacSHA512(authPhrase, key).toString();
             var hash = CryptoJS.SHA256(passPhrase).toString();
             var token = CryptoJS.AES.encrypt(id + salt + authPhrase, hash).toString();
@@ -128,8 +127,8 @@ function Login({ login, rememberMeState, setRememberMeState, loading, setLoading
             var id = decrypted.slice(0, 20);
             var salt = decrypted.slice(20, 84);
             var authPhrase = decrypted.slice(84);
-            var generatedKey = CryptoJS.PBKDF2(shortKey, salt, { keySize: 8, iterations: 1000 });
-            var key = CryptoJS.enc.Hex.stringify(generatedKey);
+            var generatedKey = CryptoJS.PBKDF2(shortKey, salt, { keySize: 18, iterations: 4000 });
+            var key = CryptoJS.enc.Base64.stringify(generatedKey);
             var authorization = CryptoJS.HmacSHA512(authPhrase, key).toString();
             var newRememberMe = {
                 state: true,
@@ -322,7 +321,6 @@ function Login({ login, rememberMeState, setRememberMeState, loading, setLoading
 
 const mapStateToProps = state => {
     return {
-        loginState: state.accountReducer,
         rememberMeState: state.rememberMeReducer,
         loading: state.loginLoadingReducer
     };

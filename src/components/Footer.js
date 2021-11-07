@@ -3,7 +3,7 @@ import { Divider, IconButton, Grid, Typography, Container, Link } from '@materia
 import githubIcon from "../images/github-brands.svg";
 import linkedinIcon from "../images/linkedin-in-brands.svg";
 
-const Footer = () => {//main page düzenle
+const Footer = () => {
 
     return (
         <div>

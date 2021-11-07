@@ -49,9 +49,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-//const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
-const RecordDetail = ({ recordsVisible, editMode, setRecordsVisibleState, updateFailed, setUpdateError }) => {
+const RecordDetail = ({ recordsVisible, editMode, setRecordsVisibleState}) => {
 
     const { id } = useParams();
     const classes = useStyles();
