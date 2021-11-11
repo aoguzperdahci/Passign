@@ -39,6 +39,12 @@ const SearchBar = ({ recordsVisible, setRecordsVisibleState, searchText, setSear
         return record;
     }
 
+    const clearInput = () => {
+        setSearchTextState("");
+        var records = recordsVisible.map(record => search(record, ""));
+        setRecordsVisibleState(records);
+    }
+
     return (
         <Box>
             <Paper className={classes.searchBarContainer}>
@@ -48,8 +54,8 @@ const SearchBar = ({ recordsVisible, setRecordsVisibleState, searchText, setSear
                     onChange={handleSearchTextChange}
                     value={searchText}
                 />
-                <IconButton className={classes.searchButton} aria-label="search">
-                    <span className="material-icons md-48">search</span>
+                <IconButton aria-label="search" onClick={clearInput}>
+                    <span className="material-icons md-48"> {searchText === "" ? "search" : "clear"}</span>
                 </IconButton>
             </Paper>
         </Box>

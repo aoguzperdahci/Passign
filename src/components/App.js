@@ -9,6 +9,7 @@ import LoginPage from '../pages/LoginPage';
 import SnackbarAlert from './SnackbarAlert';
 import RecordsDetailPage from '../pages/RecordsDetailPage';
 import RecordsPage from '../pages/RecordsPage';
+import NotFoundPage from '../pages/NotFoundPage';
 
 const theme = createTheme(({
   typography: {
@@ -55,6 +56,8 @@ function App({ loginState }) {
             <Route path="/records/:id">
             {loginState.state ?  <RecordsDetailPage /> : <Redirect to="/login" />}
             </Route>
+
+            <Route> <NotFoundPage/> </Route>
             
           </Switch>
 

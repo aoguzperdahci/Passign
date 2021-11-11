@@ -22,6 +22,17 @@ const useStyles = makeStyles((theme) => ({
     top: -10,
     paddingLeft: 20
   },
+  fontSize: {
+    opacity: 0.6,
+    [theme.breakpoints.up('sm')]: {
+      fontSize: '1.3rem',
+      top: 25
+  },
+  [theme.breakpoints.down('xs')]: {
+      fontSize: '1rem',
+      top: 35
+  },
+  },
   img: {
     width: 80,
     height: 80,
@@ -40,7 +51,7 @@ const FeedItem = ({ record }) => {
         <div className={classes.record}>
           <img src={logoFind(record.website.toLowerCase())} alt={record.website} className={classes.img} />
           <h2 className={classes.text}>{record.website}</h2>
-          <h2 className={classes.text} style={{ opacity: 0.6, top: 25 }}>{record.username}</h2>
+          <h2 className={[classes.fontSize, classes.text].join(" ")}>{record.username}</h2>
           {id == record.id && <span style={{ fontSize: 34, color: "#ffffff", right: 20, top: 25, position: "absolute" }} className="material-icons md-48">arrow_forward_ios</span>}
         </div>
 

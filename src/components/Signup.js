@@ -159,26 +159,26 @@ const Signup = ({ create, account, setSnackbarAlert }) => {
             orientation: "landscape",
             format: [1920, 1080],
             unit: "px"
-        })
+        });
         doc.addImage(imgData, 'JPEG', 0, 0, 1920, 1080);
 
         doc.setFillColor(187, 187, 187);
         doc.roundedRect(605, 180, 1070, 50, 5, 5, "F");
 
-        doc.setLineWidth(1)
-        doc.setDrawColor(0)
-        doc.setFillColor(255, 59, 71)
-        doc.circle(620, 195, 7, "FD")
+        doc.setLineWidth(1);
+        doc.setDrawColor(0);
+        doc.setFillColor(255, 59, 71);
+        doc.circle(620, 195, 7, "FD");
 
-        doc.setFillColor(255, 193, 0)
-        doc.circle(640, 195, 7, "FD")
+        doc.setFillColor(255, 193, 0);
+        doc.circle(640, 195, 7, "FD");
 
-        doc.setFillColor(0, 215, 66)
-        doc.circle(660, 195, 7, "FD")
+        doc.setFillColor(0, 215, 66);
+        doc.circle(660, 195, 7, "FD");
 
         doc.setFont("Courier");
-        doc.setFontSize(30)
-        doc.text(980, 200, "Terminal-- -bash --80x24")
+        doc.setFontSize(30);
+        doc.text(980, 200, "Terminal-- -bash --80x24");
 
         doc.setLineWidth(0);
         doc.setFillColor(21, 21, 21);
@@ -187,22 +187,22 @@ const Signup = ({ create, account, setSnackbarAlert }) => {
 
         var index = Math.ceil(shortKey.length / 2) + 24;
 
-        doc.setTextColor(255, 255, 255)
-        doc.text(630, 270, "Passign:~ anonymous-user$ login -info")
-        doc.text(630, 310, "Master Key: " + account.id + encryptionKey.slice(0, index))
-        doc.text(630, 350, encryptionKey.slice(index))
-        doc.text(630, 390, "Short Key: " + shortKey)
-        doc.text(630, 430, "Website: passigndev.web.app")
-        doc.link(750, 415, 250, 20, { url: "https://passigndev.web.app/login" });
-        doc.text(630, 510, "Passign:~ anonymous-user$ contact -info")
-        doc.text(630, 550, "Email: ahmetoguzperdahci@gmail.com")
-        doc.text(630, 590, "Linkedin: www.linkedin.com/in/aoguzperdahci")
+        doc.setTextColor(255, 255, 255);
+        doc.text(630, 270, "Passign:~ anonymous-user$ login -info");
+        doc.text(630, 310, "Master Key: " + account.id + encryptionKey.slice(0, index));
+        doc.text(630, 350, encryptionKey.slice(index));
+        doc.text(630, 390, "Short Key: " + shortKey);
+        doc.text(630, 430, "Website: passignapp.web.app");
+        doc.link(750, 415, 250, 20, { url: "https://passignapp.web.app/login" });
+        doc.text(630, 510, "Passign:~ anonymous-user$ contact -info");
+        doc.text(630, 550, "Email: ahmetoguzperdahci@gmail.com");
+        doc.text(630, 590, "Linkedin: www.linkedin.com/in/aoguzperdahci");
         doc.link(760, 575, 450, 20, { url: "https://www.linkedin.com/in/aoguzperdahci/" });
-        doc.text(630, 630, "Github: www.github.com/aoguzperdahci")
+        doc.text(630, 630, "Github: www.github.com/aoguzperdahci");
         doc.link(735, 615, 380, 20, { url: "https://github.com/aoguzperdahci" });
-        doc.text(630, 710, "Passign:~ anonymous-user$ |")
+        doc.text(630, 710, "Passign:~ anonymous-user$ |");
 
-        doc.save("Passign.pdf")
+        doc.save("Passign.pdf");
     }
 
     return (
@@ -210,7 +210,7 @@ const Signup = ({ create, account, setSnackbarAlert }) => {
             <div className={classes.paper}>
                 <Avatar className={classes.avatar}>
                 </Avatar>
-                <Typography component="h1" variant="h5">
+                <Typography variant="h5">
                     Sign up
                 </Typography>
 
