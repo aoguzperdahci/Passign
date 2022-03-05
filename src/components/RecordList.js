@@ -9,8 +9,8 @@ import FeedItem from "./FeedItem";
 
 const useStyles = makeStyles((theme) => ({
     box: {
-        marginLeft: theme.spacing(2),
-        marginRight: theme.spacing(2)
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1)
     }
 }));
 
@@ -32,7 +32,9 @@ const RecordList = ({ records }) => {
                 </Grid>
                 <Hidden smDown>
                     <Grid item xs>
-                        {id && (<RecordDetail />)}
+                        <Box className={classes.box}>
+                            {id && (<RecordDetail />)}
+                        </Box>
                     </Grid>
                 </Hidden>
             </Grid>

@@ -10,10 +10,19 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         alignItems: 'center',
         alignContent: 'center',
-        width: "100%",
-        position: "sticky",
+        width: "38%",
+        position: "fixed",
         top: 60,
-        display: "flex"
+        display: "flex",
+        [theme.breakpoints.down('lg')]: {
+            width: "45%"
+          },
+        [theme.breakpoints.down('md')]: {
+            width: "50%"
+          },
+        [theme.breakpoints.down('sm')]: {
+            width: "100%"
+          }
     },
     form: {
         marginTop: theme.spacing(1),
@@ -23,11 +32,11 @@ const useStyles = makeStyles((theme) => ({
         height: "100%",
     },
     textField: {
-        width: "85%",
+        width: "83%",
         display: "flex",
     },
     boxField: {
-        marginLeft: 20,
+        marginLeft: 10,
         marginTop: theme.spacing(4),
         position: "relative"
     },
@@ -36,7 +45,8 @@ const useStyles = makeStyles((theme) => ({
         padding: 15,
         position: "absolute",
         bottom: -5,
-        left: "85%"
+        left: "83%",
+        boxSizing: "border-box"
     },
     delete: {
         color: "#ffffff",
@@ -90,7 +100,7 @@ const RecordDetail = ({ recordsVisible, editMode, setRecordsVisibleState}) => {
     };
 
     const generatePassword = () => {
-        var chars = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%&()[]{}*/-+?<|>=_ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        var chars = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%&*-+?<>ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         var shuffledChars = shuffle(chars);
         var passwordLength = Math.floor(Math.random() * 10) + 15;
         var password = "";
