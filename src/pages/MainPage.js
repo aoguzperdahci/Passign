@@ -202,7 +202,7 @@ const MainPage = () => {
                             <p> 6) Select the folder that you unziped in the first step</p>
                             <p> if you would have any trouble, you can search for installing extension in developer mode for specific browser </p>
 
-                            <Button variant="contained" color="primary" style={{marginLeft: 200}}><a download href="Passign.rar" style={{textDecoration: "none", color:"white"}}>Download</a></Button>
+                            <Button variant="contained" color="primary" style={{marginLeft: 200}}><a download href="Passign.zip" style={{textDecoration: "none", color:"white"}}>Download</a></Button>
 
                         </DialogContent>
                         <DialogActions>
